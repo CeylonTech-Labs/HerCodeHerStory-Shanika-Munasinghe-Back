@@ -48,6 +48,6 @@ export const updateCertificate = asyncHandler(async (req, res) => {
 
 export const deleteCertificate = asyncHandler(async (req, res) => {
   const { id } = idParamSchema.parse(req.params);
-  await prisma.certificate.delete({ where: { id } });
+  await prisma.certificate.deleteMany({ where: { id } });
   return sendNoContent(res);
 });

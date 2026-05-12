@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from "express";
+import { Prisma } from "@prisma/client";
 import { ZodError } from "zod";
 import { env } from "../config/env";
 
@@ -27,6 +28,13 @@ export const errorMiddleware = (error: Error, _req: Request, res: Response, _nex
       success: false,
       message: "Validation failed",
       errors: error.flatten().fieldErrors
+    });
+  }
+
+  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
+    return res.status(404).json({
+      success: false,
+      message: "Record not found."
     });
   }
 
