@@ -1,0 +1,242 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum FileType {
+  IMAGE
+  VIDEO
+  DOCUMENT
+}
+
+enum ReactionType {
+  LOVE
+  CLAP
+  INSPIRED
+  HAPPY
+  AMAZING
+  LEARNED
+  EMOTIONAL
+}
+
+enum CommentStatus {
+  PENDING
+  APPROVED
+  HIDDEN
+  SPAM
+}
+
+enum ContactStatus {
+  NEW
+  READ
+  REPLIED
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(ADMIN)
+  avatarUrl String?  @db.Text
+  bio       String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Profile {
+  id             Int      @id @default(autoincrement())
+  fullName       String
+  title          String?
+  shortBio       String?  @db.Text
+  longBio        String?  @db.LongText
+  profileImage   String?  @db.Text
+  coverImage     String?  @db.Text
+  email          String?
+  phone          String?
+  location       String?
+  githubUrl      String?  @db.Text
+  linkedinUrl    String?  @db.Text
+  facebookUrl    String?  @db.Text
+  instagramUrl   String?  @db.Text
+  portfolioTitle String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Post {
+  id             Int          @id @default(autoincrement())
+  title          String
+  slug           String       @unique
+  excerpt        String?      @db.Text
+  content        String       @db.LongText
+  coverImage     String?      @db.Text
+  videoUrl       String?      @db.Text
+  location       String?
+  mood           String?
+  status         PostStatus   @default(DRAFT)
+  isFeatured     Boolean      @default(false)
+  allowComments  Boolean      @default(true)
+  allowReactions Boolean      @default(true)
+  categoryId     Int?
+  category       Category?    @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  publishedAt    DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  tags           PostTag[]
+  media          Media[]
+  reactions      Reaction[]
+  comments       Comment[]
+
+  @@index([categoryId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  slug        String   @unique
+  description String?  @db.Text
+  icon        String?
+  color       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  posts       Post[]
+}
+
+model Tag {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  slug      String    @unique
+  createdAt DateTime  @default(now())
+  posts     PostTag[]
+}
+
+model PostTag {
+  postId Int
+  tagId  Int
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+}
+
+model Media {
+  id        Int      @id @default(autoincrement())
+  postId    Int?
+  post      Post?    @relation(fields: [postId], references: [id], onDelete: SetNull)
+  fileUrl   String   @db.Text
+  fileType  FileType
+  publicId  String?  @db.Text
+  caption   String?  @db.Text
+  altText   String?  @db.Text
+  cropShape String?
+  createdAt DateTime @default(now())
+
+  @@index([postId])
+}
+
+model Reaction {
+  id           Int          @id @default(autoincrement())
+  postId       Int
+  post         Post         @relation(fields: [postId], references: [id], onDelete: Cascade)
+  reactionType ReactionType
+  visitorId    String
+  ipAddress    String?
+  createdAt    DateTime     @default(now())
+
+  @@unique([postId, visitorId, reactionType])
+  @@index([postId])
+}
+
+model Comment {
+  id        Int           @id @default(autoincrement())
+  postId    Int
+  post      Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  name      String
+  email     String?
+  comment   String        @db.Text
+  status    CommentStatus @default(PENDING)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@index([postId])
+  @@index([status])
+}
+
+model Project {
+  id              Int      @id @default(autoincrement())
+  title           String
+  slug            String   @unique
+  description     String?  @db.Text
+  longDescription String?  @db.LongText
+  techStack       String?  @db.Text
+  githubUrl       String?  @db.Text
+  liveUrl         String?  @db.Text
+  coverImage      String?  @db.Text
+  status          String?
+  isFeatured      Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Certificate {
+  id               Int       @id @default(autoincrement())
+  title            String
+  issuer           String
+  issuedDate       DateTime?
+  credentialUrl    String?   @db.Text
+  certificateImage String?   @db.Text
+  description      String?   @db.Text
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Achievement {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?   @db.Text
+  date        DateTime?
+  imageUrl    String?   @db.Text
+  category    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model TimelineEvent {
+  id          Int       @id @default(autoincrement())
+  title       String
+  description String?   @db.Text
+  eventDate   DateTime?
+  category    String?
+  imageUrl    String?   @db.Text
+  icon        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model ContactMessage {
+  id        Int           @id @default(autoincrement())
+  name      String
+  email     String
+  subject   String?
+  message   String        @db.Text
+  status    ContactStatus @default(NEW)
+  createdAt DateTime      @default(now())
+
+  @@index([status])
+}
