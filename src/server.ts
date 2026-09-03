@@ -23,11 +23,18 @@ const app = express();
 const allowedOrigins = new Set([
   env.FRONTEND_URL,
   env.BACKEND_URL,
+  "https://her-code-her-story-shanika-munasing.vercel.app",
+  "https://her-code-her-story-shanika-munasinghe-front-dd81d2ea1.vercel.app",
   "http://localhost:3000",
   "http://localhost:3001",
   "http://localhost:3002",
   "http://localhost:3003"
 ]);
+
+env.FRONTEND_URLS?.split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean)
+  .forEach((origin) => allowedOrigins.add(origin));
 
 const isLocalOrigin = (origin: string) => {
   try {
