@@ -46,11 +46,11 @@ Express.js, TypeScript, Prisma and MySQL backend for the HerCodeHerStory persona
    npm run prisma:seed
    ```
 
-   Optional seed credentials:
+   Admin seed credentials:
 
    ```env
-   SEED_ADMIN_EMAIL="admin@example.com"
-   SEED_ADMIN_PASSWORD="change-this-password"
+   SEED_ADMIN_EMAIL="shanika.uok2@gmail.com"
+   SEED_ADMIN_PASSWORD="21PQshani@"
    ```
 
 6. Run the development server:
