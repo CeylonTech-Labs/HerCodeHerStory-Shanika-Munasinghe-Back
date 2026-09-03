@@ -59,6 +59,14 @@ app.use(
 app.use(express.json({ limit: "5mb" }));
 app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 
+app.get("/", (_req, res) => {
+  res.json({
+    success: true,
+    message: "HerCodeHerStory backend API is running",
+    health: "/health"
+  });
+});
+
 app.get("/health", (_req, res) => {
   res.json({
     success: true,
@@ -84,16 +92,20 @@ app.use("/api", contactRoutes);
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
 
-const server = app.listen(env.PORT, () => {
-  console.log(`HerCodeHerStory backend is running on port ${env.PORT}`);
-});
-
-const shutdown = async () => {
-  await prisma.$disconnect();
-  server.close(() => {
-    process.exit(0);
+if (!process.env.VERCEL) {
+  const server = app.listen(env.PORT, () => {
+    console.log(`HerCodeHerStory backend is running on port ${env.PORT}`);
   });
-};
 
-process.on("SIGINT", shutdown);
-process.on("SIGTERM", shutdown);
+  const shutdown = async () => {
+    await prisma.$disconnect();
+    server.close(() => {
+      process.exit(0);
+    });
+  };
+
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
+}
+
+export default app;
