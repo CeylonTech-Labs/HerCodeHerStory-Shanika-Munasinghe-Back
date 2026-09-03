@@ -27,8 +27,8 @@ const slugify = (value: string) =>
     .replace(/^-+|-+$/g, "");
 
 async function main() {
-  const adminEmail = process.env.SEED_ADMIN_EMAIL || "admin@hercodeherstory.com";
-  const adminPassword = process.env.SEED_ADMIN_PASSWORD || "Admin@123456";
+  const adminEmail = process.env.SEED_ADMIN_EMAIL || "shanika.uok2@gmail.com";
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD || "21PQshani@";
   const hashedPassword = await bcrypt.hash(adminPassword, 12);
 
   await prisma.user.upsert({
